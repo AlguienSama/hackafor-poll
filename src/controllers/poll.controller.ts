@@ -86,41 +86,32 @@ export const votePoll = async (req: Request, res: Response) => {
 
   try {
 
-    const poll = await PollEntity.findOne({
-      where: {
-        poll_id: pollId
-      }
-    });
-    const user = await UserEntity.findOne({
-      where: {
-        user_id: userId
-      }
-    });
-
-    if (!(poll && user && option)) {
+    if (!(pollId && userId && option)) {
       return res.status(404).send({message: 'Not Found'});
     }
 
-    if (!(poll.options.find((o) => { if (o.id === option) return true }))) {
-      return res.status(404).send({message: 'Not Found'});
+    const relation = await PollRelationshipEntity.findOneBy({
+      user: userId,
+      poll: pollId
+    });
+
+    if (!relation) {
+      const newRelation = new PollRelationshipEntity()
+      newRelation.poll = pollId;
+      newRelation.user = userId;
+      newRelation.option = option;
+
+      await newRelation.save();
+      return res.status(201).send(newRelation);
     }
-
-    if (!poll.votes.includes(user)) {
-      poll.votes ? poll.votes.push(user) : poll.votes = [user];
-
-      const relation = new PollRelationshipEntity()
-      relation.poll = poll.poll_id;
-      relation.user = user.user_id;
-      relation.option = option;
-
-      await relation.save();
-      await poll.save()
+    if (relation.option == option) {
+      await PollRelationshipEntity.delete({poll: pollId, user: userId});
     } else {
-      poll.votes = poll.votes.filter(v => v.user_id !== user.user_id);
-
-      await PollRelationshipEntity.delete({poll: poll.poll_id, user: user.user_id});
-      await poll.save();
+      relation.option = option;
+      relation.save();
     }
+
+    return res.status(200).send(relation);
 
   } catch (e) {
     res.status(500).send({message: 'Internal Server Error'});
