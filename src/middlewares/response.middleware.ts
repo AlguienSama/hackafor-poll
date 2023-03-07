@@ -1,0 +1,2 @@
+const responseOk = (body: object) => {
+}
