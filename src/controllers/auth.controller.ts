@@ -15,7 +15,6 @@ export const login = async (req: Request, res: Response) => {
 
     return res.status(200).send(user);
   } catch (error) {
-    console.log(error)
     res.status(400).send(error);
   }
 }

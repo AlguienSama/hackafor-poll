@@ -22,7 +22,6 @@ export const createPoll = async (req: Request, res: Response) => {
 
     res.status(201).send(poll);
   } catch (error) {
-    console.log(error);
     res.status(400).send(error)
   }
 }
@@ -58,7 +57,6 @@ export const getUserParticipatedPolls = async (req: Request, res: Response) => {
 
 export const getListPolls = async (req: Request, res: Response) => {
   const userId = res.locals.jwt.user_id;
-  console.log(userId)
 
   const whereOptions: { user_registred?: boolean } = {};
   if (!userId) { whereOptions.user_registred = false; }

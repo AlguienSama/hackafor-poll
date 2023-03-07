@@ -14,7 +14,7 @@ export const AppDataSource = new DataSource({
   password: process.env.TYPEORM_PASSWORD,
   database: process.env.TYPEORM_DATABASE,
   synchronize: true,
-  logging: true,
+  logging: false,
   entities: [
     UserEntity, PollEntity
   ],
